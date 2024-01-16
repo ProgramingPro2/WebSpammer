@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Spam</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #emailForm, #status {
+            margin: 0 auto;
+            width: fit-content;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        input, textarea, button {
+            margin: 10px 0;
+        }
+    </style>
+    <script>
+        function startEmailSending() {
+            const formData = new FormData(document.getElementById('emailForm'));
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    updateStatus();
+                }
+            }).catch(error => console.error('Error:', error));
+        }
+
+        function updateStatus() {
+            fetch('/email_status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('status').innerHTML = "Error: " + data.error;
+                        return;
+                    }
+                    if (!data.completed) {
+                        document.getElementById('status').innerHTML = "Email number " + data.count + " sent out of " + data.total;
+                        setTimeout(updateStatus, 1000);
+                    } else {
+                        document.getElementById('status').innerHTML = "Email sending completed!";
+                    }
+                });
+        }
+    </script>
+</head>
+<body>
+    <div id="Info"></div>
+    <h1>Email Spam</h1>
+    <p>Send a bunch of emails to someone</p>
+    <p>Warning: This will send a lot of emails to the email you specify. Use at your own risk.</p>
+    <p>Make sure you have enabled "Less secure app access" on the google account settings you are using to send the emails.</p>
+    <p>You also need to have 2FA off for this to work. Otherwise, the emails will not be sent.</p>
+    <p>Link to enable "Less secure app access":</p>
+    <a href="https://myaccount.google.com/lesssecureapps">https://myaccount.google.com/lesssecureapps</a>
+    <br><br>
+    <form id="emailForm">
+        <input type="email" name="email" placeholder="Enter email here" required><br>
+        <input type="password" name="password" placeholder="Enter google password here" required><br>
+        <input type="email" name="email_to_send_to" placeholder="Enter email to send to here" required><br>
+        <input type="text" name="subject" placeholder="Enter subject here" required><br>
+        <input type="number" name="wait_time" placeholder="Enter wait time between emails in seconds here" required><br>
+        <input type="number" name="number_of_emails" placeholder="Enter number of emails to send here" required><br>
+        <textarea name="message" placeholder="Enter message here" required></textarea><br>
+        <button type="button" onclick="startEmailSending()">Start Spam</button>
+    </form>
+    <div id="status"></div>
+</body>
+</html>
