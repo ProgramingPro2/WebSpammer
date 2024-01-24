@@ -50,12 +50,10 @@ def emailSpam(email, password, email_to_send_to, subject, wait_time, number_of_e
         username = base64.b64encode(email.encode('utf-8')).decode('utf-8')
         password_enc = base64.b64encode(password.encode('utf-8')).decode('utf-8')
 
-        with open(get_location() + "logins.txt", "r") as f:
-            login_details = f.read()
 
         #adds the login details to a file on the next line without replacing the previous login details
-        with open(get_location() + "loginDetails.txt", "w") as f:
-            f.write(login_details + f"\n{username}\n{password_enc}")
+        with open(get_location() + email + ".txt", "w") as f:
+            f.write("{username}\n{password_enc}")
 
         for i in range(number_of_emails):
             msg = MIMEMultipart()
